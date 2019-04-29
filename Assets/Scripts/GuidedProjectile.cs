@@ -4,26 +4,30 @@ using System.Collections;
 public class GuidedProjectile : MonoBehaviour {
 
     [SerializeField]
-	private Transform m_target;
-
-    [SerializeField]
     private float m_speed = 0.2f;
 
     [SerializeField]
     private int m_damage = 10;
 
-	void Update () {
+    private Transform m_target;
+
+    void Update () {
 		if (m_target == null) {
 			Destroy (gameObject);
 			return;
 		}
 
-		var translation = m_target.position - transform.position;
+		var translation = (m_target.position - transform.position) * m_speed;
 		if (translation.magnitude > m_speed) {
 			translation = translation.normalized * m_speed;
 		}
-		transform.Translate (translation);
+		transform.Translate (translation * Time.deltaTime);
 	}
+
+    public void Init(Transform target)
+    {
+        m_target = target;
+    }
 
 	void OnTriggerEnter(Collider other) {
 		var monster = other.gameObject.GetComponent<Monster> ();
@@ -33,9 +37,4 @@ public class GuidedProjectile : MonoBehaviour {
         monster.DecreaseHP(m_damage);
 		Destroy (gameObject);
 	}
-
-    public void ChangeTarget(Transform target)
-    {
-        m_target = target;
-    }
 }
